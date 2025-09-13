@@ -1,98 +1,121 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Button } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { ThemedText } from '@/components/themed-text';
+import { schedulePushNotification } from '../_layout';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const transactions = [
+    { id: '1', title: 'Grocery Store', amount: '-$45.00', date: 'Sep 10' },
+    { id: '2', title: 'Salary', amount: '+$1500.00', date: 'Sep 9' },
+    { id: '3', title: 'Coffee Shop', amount: '-$5.50', date: 'Sep 8' },
+  ];
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+  return (
+    <ThemedView style={styles.container}>
+      {/* Account Balance Section */}
+      <View style={styles.balanceContainer}>
+        <ThemedText type="title" style={styles.balanceTitle}>
+          Account Balance
         </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+        <ThemedText type="title" style={styles.balanceAmount}>
+          $12,345.67
         </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+
+      {/* Quick Actions Section */}
+      <View style={styles.quickActionsContainer}>
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.actionText}>Send Money</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.actionText}>Pay Bills</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.actionText}>Request Money</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Recent Transactions Section */}
+      <View style={styles.transactionsContainer}>
+        <ThemedText type="subtitle" style={styles.sectionTitle}>
+          Recent Transactions
+        </ThemedText>
+        <FlatList
+          data={transactions}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.transactionItem}>
+              <Text style={styles.transactionTitle}>{item.title}</Text>
+              <Text style={styles.transactionAmount}>{item.amount}</Text>
+              <Text style={styles.transactionDate}>{item.date}</Text>
+            </View>
+          )}
+        />
+      </View>
+      <Button
+        title="Press to schedule a notification"
+        onPress={async () => {
+          await schedulePushNotification();
+        }}
+      />
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    padding: 16,
   },
-  stepContainer: {
-    gap: 8,
+  balanceContainer: {
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  balanceTitle: {
+    fontSize: 18,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  balanceAmount: {
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
+  quickActionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 24,
+  },
+  actionButton: {
+    backgroundColor: '#4CAF50',
+    padding: 12,
+    borderRadius: 8,
+  },
+  actionText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  transactionsContainer: {
+    flex: 1,
+  },
+  sectionTitle: {
+    marginBottom: 16,
+  },
+  transactionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  transactionTitle: {
+    fontSize: 16,
+  },
+  transactionAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  transactionDate: {
+    fontSize: 14,
+    color: '#888',
   },
 });

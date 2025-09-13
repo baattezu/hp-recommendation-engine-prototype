@@ -1,6 +1,10 @@
 # vscode & IDEs
 .vscode/
 .idea/
+venv
+
+# data
+data
 
 # Logs
 logs
