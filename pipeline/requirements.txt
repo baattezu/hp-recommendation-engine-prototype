@@ -2,5 +2,5 @@ apache-airflow
 pandas
 pyyaml
 requests
-json
-math
+openai
+google-generativeai

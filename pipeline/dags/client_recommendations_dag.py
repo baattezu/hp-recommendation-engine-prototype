@@ -4,10 +4,11 @@ from datetime import datetime, timedelta
 
 from tasks.load_data import load_data
 from tasks.compute_signals import compute_signals
-from tasks.compute_benefits import compute_benefits
+from tasks.compute_benefits import compute_products
 from tasks.select_best_product import select_best_product
 from tasks.generate_summary import generate_summary
-from tasks.send_notification import send_notification
+from tasks.send_notification_with_mobile import send_notification
+from tasks.send_notification import send_notification_to_mobile
 from utils.config_loader import load_config
 
 default_args = {
@@ -22,52 +23,49 @@ with DAG(
     schedule="@daily",   # 👈 новое имя параметра
     catchup=False,
     max_active_runs=1,
-    tags=["hackathon"],
+    tags=["hackathon"]
 ) as dag:
 
     @task
     def load():
-        tx, tr = load_data(
-            "/opt/airflow/data/client_50_transactions_3m.csv",
-            "/opt/airflow/data/client_50_transfers_3m.csv"
+        tx, tr, clients = load_data(
+            "/opt/airflow/data/client_2_transactions_3m.csv",
+            "/opt/airflow/data/client_2_transfers_3m.csv",
+            "/opt/airflow/data/clients.csv"
         )
-        return {"transactions": tx, "transfers": tr}
+        client_code = 2
+        avg_monthly_balance = clients[clients['client_code'] == client_code]['avg_monthly_balance_KZT'].values[0]
+        return {"transactions": tx, "transfers": tr, "avg_monthly_balance": avg_monthly_balance}
 
     @task
     def compute(loaded):
-        client_profile = {"avg_balance": 1_000_000, "avg_monthly_balance_KZT": 500_000}
-        signals, category_spend, travel, premium, online = compute_signals(
-            client_profile, loaded["transactions"]
-        )
-        return {
-            "signals": signals,
-            "category_spend": category_spend,
-            "travel": travel,
-            "premium": premium,
-            "online": online,
-            "client_profile": client_profile,
-        }
-
+        signals = compute_signals(loaded)
+        return signals
+    
     @task
     def benefits(sigs):
-        params = load_config()
-        top3 = sorted(sigs["category_spend"], key=sigs["category_spend"].get, reverse=True)[:3]
-        b = compute_benefits(
-            params,
-            sigs["signals"],
-            sigs["category_spend"],
-            sigs["travel"],
-            sigs["premium"],
-            sigs["online"],
-            top3,
-            sigs["client_profile"],
-        )
+        b = compute_products(sigs)
         return b
 
     @task
-    def select_and_summary(ben):
+    def select_and_summary(ben, sigs):
         best = select_best_product(ben)
-        return generate_summary(best, ben)
+        product, data = best
+        value = ben[product]["benefit"]
+        summary = generate_summary(best)
+        send_notification_to_mobile(
+            client_profile={
+            "client_code": 2,
+            "avg_monthly_balance_KZT": 1000000,
+            "fcm_token": "dummytoken"
+            },
+            best_product=product,
+            best_value=value,
+            category_spend=sigs.get("category_spend", {}),
+            top3=sigs.get("top_categories", []),
+            summary=summary
+        )
+        return summary
 
     @task
     def notify(summary):
@@ -77,5 +75,6 @@ with DAG(
     loaded = load()
     sigs = compute(loaded)
     ben = benefits(sigs)
-    summary = select_and_summary(ben)
+    summary = select_and_summary(ben, sigs)
+
     notify(summary)
