@@ -1,43 +1,31 @@
 # Recommendation Engine Prototype
 
-## Project Overview
+## Обзор проекта
 
-This project aims to build a recommendation engine that analyzes client behavior and generates personalized product recommendations along with tailored push notifications.
+Цель проекта — построить прототип рекомендательной системы, которая анализирует поведение клиентов и генерирует персонализированные продуктовые рекомендации вместе с push-уведомлениями.
 
-## Project Structure
+## Подготовка окружения
 
-```
-project-root/
-├── data/                     # Datasets for analysis
-├── notebooks/                # Jupyter Notebooks for exploration and modeling
-├── src/                      # Source code for data processing and modeling
-├── tests/                    # Unit tests for the project
-├── outputs/                  # Results and generated outputs
-├── README.md                 # Project documentation
-```
+Клонируйте репозиторий:
+`git clone <repository-url>`
+Перейдите в каталог проекта:
+`cd hp-recommendation-engine-prototype`
+Перенесите данные в папку pipeline/data (Airflow будет читать оттуда):
+`mv data pipeline/data`
 
-## Setup Instructions
+## Запуск Airflow в Docker
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd hp-recommendation-engine-prototype
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+Перейдите в папку pipeline:
+`cd pipeline`
+Запустите Airflow с помощью Docker Compose:
+`docker compose -f docker-compose.localexec.yaml up --build`
+После сборки и запуска Airflow будет доступен по адресу:
+`http://localhost:8080`
 
-## Usage
+### Логин/пароль по умолчанию: airflow / airflow.
 
-- Place input datasets in the `data/` directory.
-- Use the notebooks in `notebooks/` for exploration and model training.
-- Run the main pipeline using the scripts in `src/`.
-- Check `outputs/` for results.
+## Использование
 
-## Contributing
-
-Feel free to submit issues or pull requests to improve the project.
+Добавляйте датасеты в pipeline/data/.
+DAG'и и скрипты пайплайнов лежат в pipeline/dags/.
+Результаты сохраняются в outputs/.
