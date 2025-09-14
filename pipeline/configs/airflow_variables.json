@@ -1,0 +1,6 @@
+{
+  "data_path": "/opt/airflow/data",
+  "output_path": "/opt/airflow/outputs",
+  "business_params": "/opt/airflow/configs/business_params.yaml",
+  "templates": "/opt/airflow/configs/templates.yaml"
+}

@@ -1,0 +1,13 @@
+travel_cashback_rate: 0.04
+premium_base_rate: 0.02
+premium_category_bonus: 0.04
+credit_card_rate_top3: 0.10
+credit_card_online_rate: 0.10
+fx_saving_per_tx: 500.0
+loan_value_buffer_rate: 0.5
+deposit_multicurr_rate_annual: 0.03
+deposit_saving_frozen_rate_annual: 0.06
+deposit_accumulative_rate_annual: 0.04
+investment_expected_annual_return: 0.05
+gold_expected_annual_return: 0.02
+cashback_cap: 200000.0

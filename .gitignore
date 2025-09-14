@@ -3,6 +3,12 @@
 .idea/
 venv
 
+# airflow
+__pycache__/
+db-data
+cache
+airflow
+
 # data
 data
 
